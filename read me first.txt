@@ -1,0 +1,12 @@
+- Fișierul de lucru este etapa2.rkt.
+
+- Pentru testare, rulați codul din checker.rkt. 
+  - Testele 0 și 2 sunt comentate pentru a nu da eroare pe scheletul lipsit de implementări.
+  - Decomentați aceste teste după ce ați copiat/modificat funcțiile din etapa 1. 
+  - Cu excepția de mai sus, fișierul checker.rkt trebuie să rămână nemodificat.
+  
+- Fișierul tutorial.rkt conține câteva exemple de manipulare a structurilor. Nu este necesar să utilizați toate facilitățile prezentate acolo.  
+
+- Pe vmchecker veți încărca o arhivă .zip conținând fișierul etapa2.rkt.
+
+- Observație: testele consideră că funcțiile care calculează liste pe baza altor liste conservă ordinea de apariție a elementelor în lista inițială.

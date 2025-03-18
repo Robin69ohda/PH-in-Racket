@@ -1,0 +1,270 @@
+#lang racket
+
+(require "etapa2.rkt")
+
+
+; ignorați următoarele linii de cod...
+(define show-defaults 999) ; câte exerciții la care s-au întors rezultate default să fie arătate detaliat
+(define prepend #t) (define nopoints #f) (define name-ex '(testul testele trecut capitolul))
+(define default-results `(#f 0 () your-code-here)) (define (default-result r) (set! default-results (cons r default-results))) (define : 'separator) (define punct 'string) (define puncte 'string) (define BONUS 'string) (define exerciții 'string)
+(define total 0) (define all '()) (define n-ex 0) (define p-ex 0) (define n-exercs -1) (define default-returns '()) (define (ex n sep p . s) (set! n-ex n) (set! p-ex p) (set! all (cons (list n p) all))) (define exercițiul ex) (define (sunt n s) (set! n-exercs n)) (define s-a string-append)
+(define (p . L) (map (λ (e) (display e) (when (> (string-length (format "~a" e)) 0) (display " "))) L) (newline)) (define (p-n-ex) (format "[~a]" (if nopoints (string-join (list (symbol->string (cadddr name-ex)) (number->string n-ex) "/" (number->string n-exercs))) n-ex)))
+(define (epart ep% pfix full) (if (< (caddr ep%) 1) (s-a pfix (if full "" (s-a (symbol->string (car name-ex)) " ")) (if (and nopoints (not full)) "" (number->string n-ex)) (symbol->string (cadr ep%))) (if (and nopoints (not full)) "" (s-a pfix (if full "" (s-a (symbol->string (car name-ex)) " ")) (number->string n-ex)))))
+(define (whengood ep%) (let [(pts (* p-ex (caddr ep%)))] (and (if prepend (printf "+~v: " pts) (printf "~a[OK] " (p-n-ex))) (if nopoints (p (epart ep% "" #f) "rezolvat") (p (epart ep% "" #f) "rezolvat: +" pts (if (= pts 1) 'punct 'puncte))) (set! total (+ total pts)))))
+(define (whenbad ep% gvn expcd msg) (and (when (member gvn default-results) (set! default-returns (cons (epart ep% "" #t) default-returns))) (when (or (not (member gvn default-results)) (<= (length default-returns) show-defaults)) (bad-res ep% gvn expcd msg))))
+(define (bad-res ep% gvn expcd msg) (p (if prepend "+0.0:" (format "~a[--]" (p-n-ex))) (epart ep% "la " #f) 'rezultatul gvn msg expcd))
+(define (check-conds e gvn conds) (or (null? conds) (let ([r ((car conds) gvn)]) (if (eq? r #t) (check-conds e gvn (cdr conds)) (whenbad e gvn "" (or r "nu îndeplinește condițiile (completitudine, stabilitate)"))))))
+(define (check-part part per given main-test expected . conds) (let* ([e (list n-ex part per)] [p? (pair? (cdr main-test))] [p (if p? (car main-test) identity)] [t ((if p? cadr car) main-test)] [m ((if p? cddr cdr) main-test)]) (when (eq? #t (check-conds e given conds)) (if (t (p given) expected) (whengood e) (whenbad e (p given) expected m)))))
+(define (check given main-test expected . conds) (apply check-part '- 1 given main-test expected conds))
+(define the cons) (define is (cons equal? "diferă de cel așteptat")) (define in (cons member "nu se află printre variantele așteptate"))
+(define same-set-as (cons (λ (x y) (apply equal? (map list->seteqv (list x y)))) "nu este aceeași mulțime cu"))
+(define same-unique (cons (λ (x y) (and (apply = (map length (list x y))) ((car same-set-as) x y))) "nu sunt aceleași rezultate cu"))
+(define (sumar) (when (and (not (null? default-returns)) (< show-defaults (length default-returns))) (p "... rezultatul implicit dat la" (cadr name-ex) (reverse default-returns))) (when (not nopoints) (p 'total: total 'puncte)))
+(define (mark-helper) (printf "---~nEx  puncte    Total până aici~n") (foldr (λ (e-p t) (p (car e-p) ': (cadr e-p) "puncte. total 1 -" (car e-p) ': (+ t (cadr e-p))) (+ t (cadr e-p))) 0 all) (newline))
+
+
+; Definiții ajutătoare pentru checker.
+; Structura movie are 5 câmpuri: name, rating, genre, duration și others.
+; Convenție de nume: "ms" înseamnă că filmul a fost văzut; numărul reprezintă rating-ul.
+(define m10  (make-movie 'hundreds-of-beavers  10 'comedy    '(1 48) '(slapstick action)))
+(define m9   (make-movie '12-angry-men         9  'drama     '(1 36) '(legal)))
+(define m8   (make-movie 'manchurian-candidate 8  'thriller  '(2 06) '(spy tragedy)))
+(define m7   (make-movie 'm*a*s*h              7  'comedy    '(1 56) '(satire drama)))
+(define m6   (make-movie 'pulse-kairo          6  'horror    '(1 59) '(supernatural mystery)))
+(define m5   (make-movie 'trap                 5  'horror    '(1 45) '(crime thriller)))
+(define ms10 (make-movie 'rear-window          10 'thriller  '(1 52) '(seen drama suspense)))
+(define ms9  (make-movie 'm                    9  'thriller  '(1 39) '(seen crime mystery)))
+(define ms8  (make-movie 'menilmontant         8  'drama     '(0 38) '(seen tragedy short)))
+(define ms7  (make-movie 'neo-tokyo            7  'animation '(0 50) '(seen scifi fantasy)))
+(define ms3  (make-movie 'maniac               3  'horror    '(0 51) '(seen b-horror)))
+
+
+; Testele încep de aici.
+(sunt 12 exerciții)
+
+(exercițiul 0 : 0 puncte) ; Verifică dacă implementările copiate sunt corecte, fără să acorde punctaj.
+;(check-part 'a (/ 1 10) (null? empty-ph) is #t)
+;(check-part 'b (/ 1 10) (val->ph 3) is '(3))
+;(check-part 'c (/ 1 10) (ph-empty? empty-ph) is #t)
+;(check-part 'd (/ 1 10) (ph-empty? (val->ph 3)) is #f)
+;(check-part 'e (/ 1 10) (ph-root (val->ph 5)) is 5)
+;(check-part 'f (/ 1 10) (ph-root '(3 (2) (1))) is 3)
+;(check-part 'g (/ 1 10) (ph-root empty-ph) is #f)
+;(check-part 'h (/ 1 10) (ph-subtrees '(3 (2) (1))) is '((2) (1)))
+;(check-part 'i (/ 1 10) (ph-subtrees (val->ph 4)) is '())
+;(check-part 'j (/ 1 10) (ph-subtrees empty-ph) is #f)
+
+(exercițiul 1 : 15 puncte)
+(when (andmap procedure? (list merge-max merge-min merge-max-rating))
+(check-part 'a (/ 1 10) (merge-max '() '(3)) is '(3))
+(check-part 'b (/ 1 10) (merge-max '(7 (2)) '()) is '(7 (2)))
+(check-part 'c (/ 1 10) (merge-max '(7 (2)) '(9)) is '(9 (7 (2))))
+(check-part 'd (/ 1 10) (merge-max '(5 (2)) '(3 (1))) is '(5 (3 (1)) (2)))
+(check-part 'e (/ 1 10) (merge-max '(5 (1)) '(5 (4) (4))) is '(5 (5 (4) (4)) (1)))
+(check-part 'f (/ 1 10) (merge-min '(2 (7)) '(9)) is '(2 (9) (7)))
+(check-part 'g (/ 1 10) (merge-min '(2 (5)) '(1 (3))) is '(1 (2 (5)) (3)))
+(check-part 'h (/ 1 10) (merge-min '(4 (5) (5)) '(4 (6))) is '(4 (4 (6)) (5) (5)))
+(check-part 'i (/ 1 10) (merge-max-rating (list '(manchurian-candidate . 8) (list '(neo-tokyo . 7)))
+                                          (list '(12-angry-men . 9)))
+            is (list '(12-angry-men . 9)
+                     (list '(manchurian-candidate . 8)
+                           (list '(neo-tokyo . 7)))))
+(check-part 'j (/ 1 10) (merge-max-rating (list '(menilmontant . 8) (list '(m*a*s*h . 7)))
+                                          (list '(manchurian-candidate . 8)))
+            is (list '(menilmontant . 8)
+                     (list '(manchurian-candidate . 8))
+                     (list '(m*a*s*h . 7)))))
+
+(exercițiul 2 : 10 puncte)
+; ph-insert
+;(check-part 'ph-insert-a (/ 1 40) (ph-insert merge-max 2 '()) is '(2))
+;(check-part 'ph-insert-b (/ 1 40) (ph-insert merge-max 1 '(4)) is '(4 (1)))
+;(check-part 'ph-insert-c (/ 1 40) (ph-insert merge-min 1 '(4)) is '(1 (4)))
+;(check-part 'ph-insert-d (/ 1 40) (ph-insert merge-max 8 '(5 (2))) is '(8 (5 (2))))
+;(check-part 'ph-insert-e (/ 1 40) (ph-insert merge-min 8 '(2 (5))) is '(2 (8) (5)))
+;(check-part 'ph-insert-f (/ 1 40) (ph-insert merge-max 7 '(9 (2) (4) (8))) is '(9 (7) (2) (4) (8)))
+;(check-part 'ph-insert-g (/ 1 40) (ph-insert merge-max 10 '(5 (4 (2)) (3))) is '(10 (5 (4 (2)) (3))))
+;(check-part 'ph-insert-h (/ 1 40) (ph-insert merge-max 9 '(9 (7) (3))) is '(9 (9) (7) (3)))
+;(check-part 'ph-insert-i (/ 1 40) (ph-insert merge-min 3 '(3 (7) (9))) is '(3 (3) (7) (9)))
+;; list->ph
+;(check-part 'list->ph-a (/ 1 40) (list->ph merge-max '()) is '())
+;(check-part 'list->ph-b (/ 1 40) (list->ph merge-max '(7)) is '(7))
+;(check-part 'list->ph-c (/ 1 40) (list->ph merge-max '(7 6 5 4 3 2 1)) is '(7 (6 (5 (4 (3 (2 (1))))))))
+;(check-part 'list->ph-d (/ 1 40) (list->ph merge-max '(1 2 3 4 5 6 7)) is '(7 (1) (2) (3) (4) (5) (6)))
+;(check-part 'list->ph-e (/ 1 40) (list->ph merge-min '(7 6 5 4 3 2 1)) is '(1 (7) (6) (5) (4) (3) (2)))
+;(check-part 'list->ph-f (/ 1 40) (list->ph merge-min '(1 2 3 3 4 5)) is '(1 (2 (3 (3) (4 (5))))))
+;(check-part 'list->ph-g (/ 1 40) (list->ph merge-max '(9 6 10 7 8 5 2 4 3 1)) is '(10 (9) (6) (8 (7) (5 (4 (2) (3 (1)))))))
+;; two-pass-merge-LR
+;(check-part 'two-pass-merge-LR-a (/ 1 40) (two-pass-merge-LR merge-max '()) is '())
+;(check-part 'two-pass-merge-LR-b (/ 1 40) (two-pass-merge-LR merge-max '((5 (4)))) is '(5 (4)))
+;(check-part 'two-pass-merge-LR-c (/ 1 40) (two-pass-merge-LR merge-max '((8 (3)) (7 (2)))) is '(8 (7 (2)) (3)))
+;(check-part 'two-pass-merge-LR-d (/ 1 40) (two-pass-merge-LR merge-min '((3 (8)) (2 (7)))) is '(2 (3 (8)) (7)))
+;(check-part 'two-pass-merge-LR-e (/ 1 40) (two-pass-merge-LR merge-max '((2) (8) (4 (1)) (9))) is '(9 (8 (2)) (4 (1))))
+;(check-part 'two-pass-merge-LR-f (/ 1 40) (two-pass-merge-LR merge-min '((2) (8) (1 (4)) (9))) is '(1 (2 (8)) (9) (4)))
+;(check-part 'two-pass-merge-LR-g (/ 1 40)
+;            (two-pass-merge-LR merge-max '((4 (3))
+;                                           (10 (6) (6 (5)))
+;                                           (8 (2))))
+;            is '(10 (8 (2)) (4 (3)) (6) (6 (5))))
+;(check-part 'two-pass-merge-LR-h (/ 1 40)
+;            (two-pass-merge-LR merge-max '((6 (2))
+;                                           ()
+;                                           (4 (4 (1)))
+;                                           (8 (3 (2) (3)))
+;                                           (9)))
+;            is '(9 (8 (6 (2)) (4 (4 (1))) (3 (2) (3)))))
+;(check-part 'two-pass-merge-LR-i (/ 1 40)
+;            (two-pass-merge-LR merge-max '((15 (7) (12))
+;                                           (8)
+;                                           (11 (7))
+;                                           (13 (8) (3) (2))
+;                                           (11 (2) (6) (10) (7))
+;                                           (9 (0))))
+;            is '(15 (11 (9 (0)) (2) (6) (10) (7)) (13 (11 (7)) (8) (3) (2)) (8) (7) (12)))
+;(check-part 'two-pass-merge-LR-j (/ 1 40)
+;            (two-pass-merge-LR merge-max '((79 (61) (11)) (42 (37)) (74 (9) (69 (5)))
+;                                                          (19) (65 (20) (37)) (77)
+;                                                          (98 (64 (27) (48))) (91) (0)))
+;            is '(98 (0) (79 (77 (65 (20) (37))) (74 (19) (9) (69 (5))) (42 (37)) (61) (11)) (91) (64 (27) (48))))
+;(check-part 'two-pass-merge-LR-k (/ 1 40)
+;            (two-pass-merge-LR merge-max '((60) (86 (80) (20)) (46 (1)) (58) (73 (53 (0)))
+;                                                (85) (38) (73 (34) (22)) (58 (24)) (53)
+;                                                (87 (16)) (91 (35) (11)) (93 (49 (18))) (48)
+;                                                (73 (49))))
+;            is '(93 (73 (49)) (91 (86 (58 (53) (24)) (73 (38) (34) (22)) (85 (73 (53 (0))))
+;                                      (58 (46 (1))) (60) (80) (20)) (87 (16)) (35) (11)) (48) (49 (18))))
+;(check-part 'two-pass-merge-LR-l (/ 1 40)
+;            (two-pass-merge-LR merge-max '((84 (3)) (87) (5) (92 (21 (12))) (53 (43 (3))) (54 (35))
+;                                                    (51 (33) (36)) (24 (12) (6)) (75 (7)) (36)
+;                                                    (75 (49 (20))) (63) (40) (31) (83 (16)) (85 (26) (24))
+;                                                    (23) (15) (44 (40 (35))) (89)))
+;            is '(92 (89 (44 (40 (35)))) (23 (15)) (85 (83 (16)) (26) (24)) (40 (31)) (75 (63) (49 (20)))
+;                    (75 (36) (7)) (51 (24 (12) (6)) (33) (36)) (54 (53 (43 (3))) (35)) (87 (84 (3))) (5)
+;                    (21 (12))))
+;(check-part 'two-pass-merge-LR-m (/ 1 40) (two-pass-merge-LR merge-max '((6) (8 (0)) (8))) is '(8 (8) (6) (0)))
+;(check-part 'two-pass-merge-LR-n (/ 1 40) (two-pass-merge-LR merge-max '((10 (9) (5)) () (10 (6)) (5 (1)))) is '(10 (10 (5 (1)) (6)) (9) (5)))
+;(check-part 'two-pass-merge-LR-o (/ 1 40)
+;            (two-pass-merge-LR merge-max '((37) (47 (32)) (33) (22 (21)) (42 (26) (30)) (47 (27) (46 (38)))))
+;            is '(47 (47 (42 (26) (30)) (27) (46 (38))) (33 (22 (21))) (37) (32)))
+;(check-part 'two-pass-merge-LR-p (/ 1 40)
+;            (two-pass-merge-LR merge-max '((26) (30 (25) (24) (12)) (22) (25 (1)) (20 (18) (17) (3))
+;                                                (29 (17)) (30 (21)) (28 (8))))
+;            is '(30 (30 (28 (8)) (21)) (29 (20 (18) (17) (3)) (17)) (25 (22) (1)) (26) (25) (24) (12)))
+;(check-part 'two-pass-merge-LR-q (/ 1 40)
+;            (two-pass-merge-LR merge-max '((22 (11) (8) (0) (21)) (39 (35)) (9 (4)) (22 (6) (1) (14)) (23 (1))
+;                                                                  (39 (2) (13)) (24 (1) (15) (23)) (32 (12) (5))
+;                                                                  (36) (25 (19) (11)) (34)))
+;            is '(39 (34) (36 (25 (19) (11))) (32 (24 (1) (15) (23)) (12) (5))
+;                    (39 (23 (1)) (2) (13)) (22 (9 (4)) (6) (1) (14)) (22 (11) (8) (0) (21)) (35)))
+;(check-part 'two-pass-merge-LR-r (/ 1 40)
+;            (two-pass-merge-LR merge-min '((2 (6)) () (1 (4 (4))) (2 (3 (8) (3))) (9)))
+;            is '(1 (9) (2 (6)) (2 (3 (8) (3))) (4 (4))))
+;(check-part 'two-pass-merge-LR-s (/ 1 40)
+;            (two-pass-merge-LR merge-min '((9) (3 (4 (8))) (1) (3) (3 (7) (5)) (0 (8) (3))))
+;            is '(0 (1 (3 (9) (4 (8))) (3)) (3 (7) (5)) (8) (3)))
+;; ph-del-root
+;(check-part 'ph-del-root-a (/ 1 40) (ph-del-root merge-max '()) is #f)
+;(check-part 'ph-del-root-b (/ 1 40) (ph-del-root merge-min '(3)) is '())
+;(check-part 'ph-del-root-c (/ 1 40) (ph-del-root merge-min '(1 (2) (3))) is '(2 (3)))
+;(check-part 'ph-del-root-d (/ 1 40) (ph-del-root merge-max '(70 (4 (3)) (10 (6) (6 (5))) (8 (2)))) is '(10 (8 (2)) (4 (3)) (6) (6 (5))))
+;(check-part 'ph-del-root-e (/ 1 40) (ph-del-root merge-max '(80 (15 (7) (12))
+;                                                                (8)
+;                                                                (11 (7))
+;                                                                (13 (8) (3) (2))
+;                                                                (11 (2) (6) (10) (7))
+;                                                                (9 (0))))
+;            is '(15 (11 (9 (0)) (2) (6) (10) (7)) (13 (11 (7)) (8) (3) (2)) (8) (7) (12)))
+
+(exercițiul 3 : 10 puncte)
+(check-part 'a (/ 1 1) (lst->movie '(12-angry-men 9 drama (1 36) (legal))) is m9)
+
+(exercițiul 4 : 10 puncte)
+(check-part 'a (/ 1 1)
+            (mark-as-seen (make-movie '12-angry-men 9 'drama '(1 36) '(legal)))
+            is            (make-movie '12-angry-men 9 'drama '(1 36) '(seen legal)))
+
+(exercițiul 5 : 10 puncte)
+(check-part 'a (/ 1 2)
+            (mark-as-seen-from-list
+             (list
+              (make-movie '12-angry-men         9  'drama    '(1 36) '(legal))
+              ms10
+              (make-movie 'manchurian-candidate 8  'thriller '(2 06) '(spy tragedy))
+              m6
+              (make-movie 'm*a*s*h              7  'comedy   '(1 56) '(satire drama)))
+             '(manchurian-candidate m*a*s*h 12-angry-men)
+             )
+            is
+            (list
+             (make-movie '12-angry-men         9  'drama    '(1 36) '(seen legal))
+             ms10
+             (make-movie 'manchurian-candidate 8  'thriller '(2 06) '(seen spy tragedy))
+             m6
+             (make-movie 'm*a*s*h              7  'comedy   '(1 56) '(seen satire drama))))
+(check-part 'b (/ 1 2)
+            (mark-as-seen-from-list
+             (list
+              ms3
+              m5
+              m6
+              (make-movie 'the-lives-of-others 10  'drama    '(2 17) '(german)))
+             '(the-kite-runner the-lives-of-others rush ford-v-ferrari)
+             )
+            is
+            (list
+             ms3
+             m5
+             m6
+             (make-movie 'the-lives-of-others 10  'drama    '(2 17) '(seen german))))
+
+
+
+(exercițiul 6 : 10 puncte)
+(check-part 'a (/ 1 2) (extract-seen (list (make-movie 'the-green-mile 9 'drama '(3 9) '(supernatural seen))
+                                           m8 ms8 m10 ms10 ms9)) is '(the-green-mile menilmontant rear-window m))
+(check-part 'b (/ 1 2) (extract-seen (list m8 m10 m9 m7))        is '())
+
+(exercițiul 7 : 15 puncte)
+(check-part 'a (/ 1 3) (rating-stats '()) is '(0 . 0))
+(check-part 'b (/ 1 3) (rating-stats (list m9 ms10 m7 ms3)) is '(13/2 . 8))
+(check-part 'c (/ 1 3) (rating-stats (list m9 m7 m10 m8 m5)) is '(0 . 39/5))
+
+(exercițiul 8 : 10 puncte)
+(check-part 'a (/ 1 1) (extract-name-rating (list ms8 m7 m8 ms3))
+            is '((menilmontant . 8) (m*a*s*h . 7) (manchurian-candidate . 8) (maniac . 3)))
+
+(exercițiul 9 : 10 puncte)
+(check-part 'a (/ 1 5) (make-rating-ph '()) is '())
+(check-part 'b (/ 1 5) (make-rating-ph (list m9)) is (list '(12-angry-men . 9)))
+(check-part 'c (/ 1 5) (make-rating-ph (list m7 m5 m10))
+            is (list '(hundreds-of-beavers . 10) (list '(m*a*s*h . 7)) (list '(trap . 5))))
+(check-part 'd (/ 1 5) (make-rating-ph (list ms8 m10 m9 ms9))
+            is (list '(hundreds-of-beavers . 10) (list '(menilmontant . 8)) (list '(m . 9) (list '(12-angry-men . 9)))))
+(check-part 'e (/ 1 5) (make-rating-ph (list ms10 m6 ms8 m8 m7 ms3))
+            is (list '(rear-window . 10)
+                     (list '(manchurian-candidate . 8)
+                           (list '(pulse-kairo . 6))
+                           (list '(menilmontant . 8))
+                           (list '(m*a*s*h . 7)
+                                 (list '(maniac . 3))))))
+
+(exercițiul 10 : 10 puncte)
+(check-part 'a (/ 1 5) (list (before? 3 4 '()) (before? 2 2 '())) is '(#f #t))
+(check-part 'c (/ 1 5) (list (before? 4 1 '(5 4 3 2 1 0)) (before? '(4) '(1) '(5 4 3 2 (1) 0))) is '(#t #f))
+(check-part 'd (/ 1 5) (before? 4 7 '((6 5) 4 haskell 1 0)) is #t) ; Nu apar ambele numere in listă.
+(check-part 'e (/ 1 5) (before? 2 7 '(8 4 7 2 curry 6 2 2 9 10)) is #f)
+(check-part 'f (/ 1 5) (list (before? 0 4 '(1 2 3 4)) (before? 0 0 '(1 2 3))) is '(#f #t))
+
+(exercițiul 11 : 10 puncte)
+(check-part 'a (/ 1 5) (make-genre-ph '() '(comedy)) is '())
+(check-part 'b (/ 1 5) (list (make-genre-ph (list m8 m6) '(horror thriller))
+                             (make-genre-ph (list m8 m6) '(animation comedy)))
+            is (list (list m6 (list m8)) (list m8 (list m6))))
+(check-part 'c (/ 1 5) (make-genre-ph (list m8 m10 m9 ms10) '(thriller drama comedy))
+            is (list ms10 (list m8) (list m10) (list m9)))
+(check-part 'd (/ 1 5) (make-genre-ph (list m8 m10 ms3 ms8 ms10) '(comedy horror drama thriller))
+            is (list m10 (list m8) (list ms3 (list ms8 (list ms10)))))
+(check-part 'e (/ 1 5) (make-genre-ph (list m10 m5 m6 ms3 ms8 ms10 m9) '(horror comedy war thriller drama))
+            is (list ms3 (list m10) (list m5) (list m6) (list ms10 (list ms8) (list m9))))
+
+(sumar)
