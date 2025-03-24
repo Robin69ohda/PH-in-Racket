@@ -1,0 +1,9 @@
+- Fișierul de lucru este etapa3.rkt, dar, pentru a beneficia de funcțiile implementate anterior, este necesar să aduceți rezolvarea etapei 2 în același folder în care rezolvați etapa 3.
+  - De aceea fișierul etapa3.rkt conține, la început, linia (require "etapa2.rkt").
+  - Este o idee bună să recitiți implementarea etapei 2 înainte de a lucra la etapa 3, pentru a vă aminti cum se apelează funcțiile și a nu reimplementa facilități deja implementate.
+
+- Pentru testare, rulați codul din checker.rkt. 
+  - Pentru a testa best-k-rating și best-k-duration, trebuie ca ambele să fie deja definite ca proceduri (fără acest test suplimentar, checker-ul ar fi dat eroare pe schelet).
+  
+- Pe vmchecker veți încărca o arhivă .zip conținând fișierele etapa2.rkt și etapa3.rkt.
+  - Nu este necesar să încărcați și checker-ul (vmchecker ignoră acel fișier și folosește checker-ul încărcat de noi).
