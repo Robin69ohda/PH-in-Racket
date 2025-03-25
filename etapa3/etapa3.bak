@@ -33,30 +33,24 @@
 ; RESTRICȚII (20p):
 ;  - Folosiți named let pentru a efectua pasul 2 al
 ;    algoritmului.
-(define (best-k op movies k)
-  (let ((ph (list->ph (merge-f op) movies)))  ; Construim pairing heap pe baza comparatorului
-    (let loop ((ph ph) (acc '()) (count 0))  ; Named let pentru extragere
-      (if (or (ph-empty? ph) (>= count k)) 
-          acc  ; Returnăm rezultatul când avem k elemente sau PH-ul e vid
-          (loop (ph-del-root (merge-f op) ph) 
-                (cons (ph-root ph) acc) 
-                (+ count 1))))))
+(define best-k
+  'your-code-here)
 
 ; best-k-rating : [Movie] x Int -> [Movie]
 ; in: listă de filme movies, număr k
 ; out: cele mai bune k filme din movies (ca rating)
 ; RESTRICȚII (5p):
 ;  - Obțineți best-k-rating ca aplicație a lui best-k.
-(define best-k-rating (λ (movies k) (reverse (best-k (λ (m1 m2) (> (movie-rating m1) (movie-rating m2))) movies k))))
+(define best-k-rating
+  'your-code-here)
 
 ; best-k-duration : [Movie] x Int -> [Movie]
 ; in: listă de filme movies, număr k
 ; out: cele mai scurte k filme din movies 
 ; RESTRICȚII (5p):
 ;  - Obțineți best-k-duration ca aplicație a lui best-k.
-(define best-k-duration (λ (movies k) (reverse (best-k (λ (m1 m2)
-                                                (< (+ (* 60 (car (movie-duration m1))) (cadr (movie-duration m1)))
-                                                   (+ (* 60 (car (movie-duration m2))) (cadr (movie-duration m2))))) movies k))))
+(define best-k-duration
+  'your-code-here)
 
 
 ; TODO 2 (30p)
@@ -74,16 +68,7 @@
 ; RESTRICȚII (20p):
 ;  - Folosiți named let pentru a itera prin perechi.
 (define (update-pairs p pairs)
-  (let loop ((rem pairs) (acc '()))
-    (if (empty? rem)
-        pairs
-        (if (p (car rem))
-          (if (ph-empty? (cdr (car rem)))
-              (append (reverse acc) rem)
-              (append (reverse acc)
-                      (cons (cons (car (car rem)) (ph-del-root merge-max (cdr (car rem))))
-                            (cdr rem))))
-          (loop (cdr rem) (cons (car rem) acc))))))
+  'your-code-here)
                   
 
 ; TODO 3 (50p)
@@ -110,35 +95,5 @@
 ;  - Folosiți named let pentru a efectua pasul 2 al
 ;    algoritmului.
 (define (best-k-ratings-overall pairs k)
-  (let* ((init-ph (foldl (lambda (pair acc)
-                           (let ((name (car pair))
-                                 (ph (cdr pair)))
-                             (if (ph-empty? ph)
-                                 acc
-                                 (ph-insert merge-max-rating (cons name (ph-root ph)) acc))))
-                         '()
-                         pairs)))
-    (let loop ((ph init-ph) (result '()) (count k) (updated-pairs pairs))
-      (if (or (ph-empty? ph) (zero? count))
-          (reverse result)
-          (let* ((best (ph-root ph))
-                 (name-root (car best))
-                 (rating-root (cdr best))
-                 (remaining-ph (ph-del-root merge-max-rating ph))
-                 (movie-ph (assoc name-root updated-pairs))
-                 (new-movie-ph (if (and movie-ph (not (ph-empty? (cdr movie-ph))))
-                               (ph-del-root merge-max (cdr movie-ph))
-                               '())))
-            (if movie-ph
-                (begin
-                  (if (ph-empty? new-movie-ph)
-                      (set! updated-pairs (remove (lambda (pair) (= (car pair) name-root)) updated-pairs))
-                      (set! updated-pairs (cons (cons name-root new-movie-ph) (remove (lambda (pair) (= (car pair) name-root)) updated-pairs)))))
-                updated-pairs)
-            (loop (if (ph-empty? new-movie-ph)
-                      remaining-ph
-                      (ph-insert merge-max-rating (cons name-root (ph-root new-movie-ph)) remaining-ph))
-                  (cons best result)
-                  (- count 1)
-                  updated-pairs))))))
+  'your-code-here)
 

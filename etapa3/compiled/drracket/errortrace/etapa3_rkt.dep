@@ -1,0 +1,1 @@
+("8.12" ta6nt ("f1dd50b150de061fee4ef014d94ee7ddf6c0117d" . "1a09e29a8a30659fe54c217d7343e80bd8e76634") #"C:\\Users\\robin\\OneDrive\\Documents\\GitHub\\PH-in-Racket\\etapa3\\etapa2.rkt" (collects #"drracket" #"private" #"drracket-errortrace-key.rkt") (collects #"racket" #"main.rkt") (collects #"racket" #"match.rkt") (collects #"racket" #"runtime-config.rkt"))
