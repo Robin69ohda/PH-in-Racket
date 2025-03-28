@@ -1,0 +1,8 @@
+- Fișierul de lucru este etapa4.rkt, dar, pentru a beneficia de funcțiile implementate anterior, este necesar să aduceți rezolvarea etapei 2 în același folder în care rezolvați etapa 4.
+  - De aceea fișierul etapa4.rkt conține, la început, linia (require "etapa2.rkt").
+
+- Pentru testare, rulați codul din checker.rkt. 
+  
+- Pe vmchecker veți încărca o arhivă .zip conținând fișierele etapa2.rkt și etapa4.rkt.
+
+- Parcurgeți exemplele de pe ocw, pentru a înțelege repede și bine ce calculează fiecare funcție.
